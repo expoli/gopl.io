@@ -15,11 +15,11 @@ const (
 感觉像是对强制类型转换时的格式化处理
 类似于Java中的toString方法
 */
-func (f Feet) String() string { return fmt.Sprintf("%gft", f) }
+func (f Feet) String() string { return fmt.Sprintf("%2.fft", f) }
 
 /*
 米的输出格式化处理
 感觉像是对强制类型转换时的格式化处理
 类似于Java中的toString方法
 */
-func (m Meters) String() string { return fmt.Sprintf("%gm", m) }
+func (m Meters) String() string { return fmt.Sprintf("%.2fm", m) }
