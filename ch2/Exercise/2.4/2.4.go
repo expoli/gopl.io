@@ -11,11 +11,11 @@ func main() {
 	x := 1000000000
 	now := time.Now()
 	popcount.PopCount(uint64(x))
-	fmt.Printf("%d s\n", int(time.Since(now)))
+	fmt.Printf("%s\n", time.Since(now))
 	now = time.Now()
 	popcount.PopCount2(uint64(x))
-	fmt.Printf("%d s\n", int(time.Since(now)))
+	fmt.Printf("%s\n", time.Since(now))
 	now = time.Now()
 	popcount.PopCount3(uint64(x))
-	fmt.Printf("%d s", int(time.Since(now)))
+	fmt.Printf("%s", time.Since(now))
 }
