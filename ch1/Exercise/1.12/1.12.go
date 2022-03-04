@@ -40,11 +40,12 @@ func main() {
 }
 
 func cyclesHandler(w http.ResponseWriter, r *http.Request) int {
-	mutex.Lock()
+	if err := r.ParseForm(); err != nil {
+		log.Print(err)
+	}
 	cycles := r.Form.Get("cycles")
 	if len(cycles) != 0 {
 		result, err := strconv.Atoi(cycles)
-		mutex.Unlock()
 		if err != nil {
 			fmt.Sprintf("error: %s", err)
 			return 5
@@ -54,7 +55,6 @@ func cyclesHandler(w http.ResponseWriter, r *http.Request) int {
 		}
 		return result
 	}
-	mutex.Unlock()
 	return 5
 }
 
