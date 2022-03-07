@@ -28,6 +28,18 @@ func main() {
 	mux := http.NewServeMux()
 	/*
 		分别绑定路由至相应的 Handler 处理函数
+		第一个db.list是一个方法值
+		也就是说db.list的调用会援引一个接收者是db的database.list方法。
+		所以db.list是一个实现了handler类似行为的函数，但是因为它没有方法（理解：该方法没有它自己的方法），
+		所以它不满足http.Handler接口并且不能直接传给mux.Handle。
+
+		语句http.HandlerFunc(db.list)是一个转换而非一个函数调用，因为http.HandlerFunc是一个类型。
+
+		ServeHTTP方法的行为是调用了它的函数本身。
+		因此HandlerFunc是一个让函数值满足一个接口的适配器，
+		这里函数和这个接口仅有的方法有相同的函数签名。
+		实际上，这个技巧让一个单一的类型例如database以多种方式满足http.Handler接口：
+		一种通过它的list方法，一种通过它的price方法等等。
 	*/
 	mux.Handle("/list", http.HandlerFunc(db.list))
 	mux.Handle("/price", http.HandlerFunc(db.price))
