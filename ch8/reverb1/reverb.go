@@ -27,6 +27,10 @@ func echo(c net.Conn, shout string, delay time.Duration) {
 func handleConn(c net.Conn) {
 	input := bufio.NewScanner(c)
 	for input.Scan() {
+		/*
+			在一个连接里面进行 echo 函数的调用，但是是阻塞状态，
+			上一个没有执行完成的时候，没办法继续下一个执行
+		*/
 		echo(c, input.Text(), 1*time.Second)
 	}
 	// NOTE: ignoring potential errors from input.Err()
@@ -46,6 +50,9 @@ func main() {
 			log.Print(err) // e.g., connection aborted
 			continue
 		}
+		/*
+			新接入一个连接就启动一个协程，去处理相应的连接请求
+		*/
 		go handleConn(conn)
 	}
 }
