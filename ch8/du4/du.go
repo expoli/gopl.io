@@ -20,6 +20,9 @@ import (
 //!+1
 var done = make(chan struct{})
 
+/*
+定义了一个工具函数，cancelled，这个函数在被调用的时候会轮询退出状态。
+*/
 func cancelled() bool {
 	select {
 	case <-done:
@@ -43,6 +46,8 @@ func main() {
 	// 取消协程，新建一个取消协程，当接收到键盘输入的时候，取消程序的运行
 	go func() {
 		os.Stdin.Read(make([]byte, 1)) // read a single byte
+		// 每当有输入被读到（比如用户按了回车键），
+		// 这个goroutine就会把取消消息通过关闭done的channel广播出去。
 		close(done)
 	}()
 	//!-2
@@ -86,6 +91,15 @@ loop:
 		}
 	}
 	printDiskUsage(nfiles, nbytes) // final totals
+	/*
+	   这里有一个方便的窍门我们可以一用：
+	   取代掉直接从主函数返回，我们调用一个panic，然后runtime会把每一个goroutine的栈dump下来。
+	   如果main goroutine是唯一一个剩下的goroutine的话，他会清理掉自己的一切资源。
+	   但是如果还有其它的goroutine没有退出，他们可能没办法被正确地取消掉，
+	   也有可能被取消但是取消操作会很花时间；所以这里的一个调研还是很有必要的。
+	   我们用panic来获取到足够的信息来验证我们上面的判断，看看最终到底是什么样的情况。
+	*/
+	//panic("du exit")
 }
 
 func printDiskUsage(nfiles, nbytes int64) {
@@ -99,6 +113,12 @@ func walkDir(dir string, n *sync.WaitGroup, fileSizes chan<- int64) {
 	defer n.Done()
 	/*
 		保证在处理文件夹的过程中，依旧能够感知到取消动作
+		walkDir这个goroutine一启动就会轮询取消状态，
+		如果取消状态被设置的话会直接返回，并且不做额外的事情。
+
+		这样我们将所有在取消事件之后创建的goroutine改变为无操作。
+
+		可以避免在取消事件发生时还去创建goroutine。
 	*/
 	if cancelled() {
 		return
