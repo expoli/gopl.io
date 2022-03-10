@@ -104,6 +104,7 @@ func Concurrent(t *testing.T, m M) {
 			// url  直接引入协程变量，防止出现幻影问题
 		}(url)
 	}
+	// 同步返回，防止出现协程泄露
 	n.Wait()
 	//!-conc
 }
