@@ -4,7 +4,7 @@
 // See page 303.
 //!+
 
-// Package word provides utilities for word games.
+// Package word2 provides utilities for word2 games.
 package word
 
 // IsPalindrome reports whether s reads the same forward and backward.
